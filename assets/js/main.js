@@ -310,3 +310,152 @@ document.addEventListener('DOMContentLoaded', function() {
 Quiz Part
 */
 
+// Function to display a remark to the user
+function displayRemark(message, color = 'blue') {
+  const remarkElement = document.getElementById('remark');
+  remarkElement.textContent = message;
+  remarkElement.style.color = color;
+}
+
+// Example usage:
+
+
+document.addEventListener('click', function (event) {
+  const questionInput = document.querySelector('#questionInput');
+  const answerOptionInputs = document.querySelectorAll('.answer-option');
+
+  // Function to check if the fields are filled
+  function areFieldsFilled() {
+    // Check question input
+    if (questionInput.value.trim() === '') {
+      console.log("question not filled");
+      displayRemark("Please fill in all required fields before proceeding.", 'red');
+      return false;
+    }
+    // Check answer option inputs
+    for (let input of answerOptionInputs) {
+      if (input.value.trim() === '') {
+        console.log("at least one answer not field");
+        displayRemark("Please fill in all required fields before proceeding.", 'red');
+        return false;
+      }
+    }
+    console.log("all filled");
+    return true;
+  }
+
+  // Function to enable/disable the "Add Question" button based on field status
+  function updateAddQuestionButton() {
+    addQuestionBtn.disabled = !areFieldsFilled();
+  }
+
+  const buttonText = event.target.textContent.trim(); // Getting the text content of the button and removing extra spaces
+  console.log("Button clicked"); // Log to console when button is clicked
+
+  if (event.target.classList.contains('btn-primary')) {
+    if (buttonText === 'Add Question') { // Checking if the button text is 'Add Question'
+      const quizEditingSection = document.querySelector('#quizEditingSection');
+      if (quizEditingSection) {
+        quizEditingSection.style.display = 'block'; // Showing the quiz editing section
+        event.target.style.display = 'none';
+        console.log("Quiz editing section displayed"); // Log to console when quiz editing section is displayed
+      }
+    } else if (buttonText === 'Add The Question') {
+
+      const questionInput = document.querySelector('#questionInput');
+      const answerOptionInputs = document.querySelectorAll('.answer-option');
+
+      // Construct the new question structure
+      const newQuestion = document.createElement('div');
+      newQuestion.classList.add('quiz-question');
+      newQuestion.innerHTML = `
+<strong class="question-title">New Question:</strong>
+<div class="question-text">
+<span class="question-text-content">${questionInput.value}</span>
+<!-- Replace button with box-icon -->
+<div class="question-buttons">
+  <box-icon name='edit' color='#001d43'></box-icon>
+  <box-icon name='trash' color='#001d43'></box-icon>
+</div>
+</div>
+<ul class="answer-options">
+${Array.from(answerOptionInputs).map((input, index) => `<li><input type="checkbox" value="${String.fromCharCode(97 + index)}"> ${input.value}</li>`).join('')}
+</ul>
+`;
+
+      // Append the new question to the quiz section
+      const quizSection = document.querySelector('.quiz-questions');
+      quizSection.appendChild(newQuestion);
+
+      // Optionally, you can clear the input fields
+      questionInput.value = '';
+      answerOptionInputs.forEach(input => input.value = '');
+
+      // Optionally, display a remark
+      updateQuestionNumbering()
+      displayRemark("New question added successfully!", 'green');
+
+    }
+  } else if (event.target.classList.contains('btn-secondary')) {
+    if (buttonText === 'Add Answer Field') { // Checking if the button text is 'Add Answer Field'
+      const quizEditingSection = document.querySelector('#quizEditingSection');
+
+      if (areFieldsFilled()) {
+        const answerOption = document.createElement('li');
+        answerOption.innerHTML = `<input type='text' class='answer-option form-control mb-2' placeholder='Enter Answer Option'>`;
+        const answerOptionsList = quizEditingSection.querySelector('.answer-options-div');
+        answerOptionsList.appendChild(answerOption);
+        
+      }
+    }
+  }
+});
+
+
+
+function updateQuestionNumbering() {
+  const quizQuestions = document.querySelectorAll('.quiz-question');
+  quizQuestions.forEach((question, index) => {
+    question.querySelector('.question-title').textContent = `Question ${index + 1}:`;
+  });
+}
+
+
+const iconCont = document.querySelector('.quiz-questions');
+
+iconCont.addEventListener('click', (event) => {
+  if (event.target.tagName === 'BOX-ICON') { // Check if the clicked element is a box-icon
+    const icon = event.target;
+    const div = icon.closest('.quiz-question');
+
+    if (icon.getAttribute('name') === 'edit') {
+      const span = div.querySelector('span');
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = span.textContent.trim();
+
+      input.classList.add('edit-field');
+      // Replace span with input for editing
+      span.replaceWith(input);
+
+      icon.setAttribute('name', 'save'); // Change icon to 'save'
+
+    } else if (icon.getAttribute('name') === 'save') {
+      const input = div.querySelector('input');
+      const span = document.createElement('span');
+      span.textContent = input.value.trim();
+
+      span.classList.add('editted-field');
+      // Replace input with span after editing
+      input.replaceWith(span);
+
+      icon.setAttribute('name', 'edit'); // Change icon back to 'edit'
+
+    } else if (icon.getAttribute('name') === 'trash') {
+      console.log("hello");
+      div.remove();
+      updateQuestionNumbering();
+    }
+  }
+});
+
