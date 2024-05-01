@@ -601,15 +601,10 @@ function displayRemark(message, color = 'blue') {
   remarkElement.textContent = message;
   remarkElement.style.color = color;
 
-  setTimeout(function() {
+  setTimeout(function () {
     remarkElement.textContent = '';
-  }, 5000); 
+  }, 5000);
 }
-
-
-
-
-
 
 // Get all checkboxes
 
@@ -617,57 +612,54 @@ function displayRemark(message, color = 'blue') {
 QR code part/ timer
 */
 
-
 function startTimer() {
-  var minutes = parseInt(document.getElementById("minutes").value);
-  var seconds = minutes * 60;
+  var interval;
+  var totalSeconds;
   var timerDisplay = document.getElementById("countdown");
   var seeResultsButton = document.getElementById("see-results");
   var qrCodeContainer = document.getElementById("qr-code-container");
   var timerContainer = document.getElementById("timer-container");
+  var startBtn = document.getElementById("startBtn");
+
+  var hours = parseInt(document.getElementById("hours").value);
+  var minutes = parseInt(document.getElementById("minutes").value);
+  var seconds = parseInt(document.getElementById("seconds").value);
+  totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
   // Hide setting of time and start button
   timerContainer.style.display = "none";
+  startBtn.style.display = "none";
+  seeResultsButton.style.display = "none"; // hide the see results button initially
+  qrCodeContainer.style.display = "none"; // hide the QR code container initially
 
   // Clear any existing countdown numbers
   timerDisplay.innerHTML = '';
 
+  // Display the timer initially
+  timerDisplay.style.display = "block";
+
   // Start the countdown
-  var countdown = setInterval(function () {
-    var minutesLeft = Math.floor(seconds / 60);
-    var secondsLeft = seconds % 60;
+  interval = setInterval(function () {
+    var hoursLeft = Math.floor(totalSeconds / 3600);
+    var minutesLeft = Math.floor((totalSeconds % 3600) / 60);
+    var secondsLeft = totalSeconds % 60;
 
     // Update the timer display with the countdown numbers
-    timerDisplay.innerHTML = `<span class="countdown-number">${minutesLeft.toString().padStart(2, '0')}</span>:<span class="countdown-number">${secondsLeft.toString().padStart(2, '0')}</span>`;
-    seeResultsButton.style.textAlign = "center";
+    timerDisplay.innerHTML = `<span class="countdown-number">${hoursLeft.toString().padStart(2, '0')}</span>:<span class="countdown-number">${minutesLeft.toString().padStart(2, '0')}</span>:<span class="countdown-number">${secondsLeft.toString().padStart(2, '0')}</span>`;
 
-    if (seconds <= 0) {
-      clearInterval(countdown);
+    if (totalSeconds <= 0) {
+      clearInterval(interval);
       timerDisplay.textContent = "Time's up!";
       seeResultsButton.style.display = "block";
-
     } else {
-      seconds--;
+      totalSeconds--;
       qrCodeContainer.style.display = "block"; // Display the QR code container
+      generateQRCode('https://www.google.com'); // Generate QR code
     }
   }, 1000);
 }
 
-function incrementMinutes() {
-  var minutesInput = document.getElementById("minutes");
-  var currentMinutes = parseInt(minutesInput.value);
-  minutesInput.value = currentMinutes + 1;
+function generateQRCode(qrCodeLink) {
+  var qrCodeImg = document.getElementById("qrCodeImg");
+  qrCodeImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrCodeLink);
 }
-
-function decrementMinutes() {
-  var minutesInput = document.getElementById("minutes");
-  var currentMinutes = parseInt(minutesInput.value);
-  if (currentMinutes > 1) {
-    minutesInput.value = currentMinutes - 1;
-  }
-}
-
-document.getElementById("see-results").addEventListener("click", function () {
-  // Scroll to the "results" section
-  document.getElementById("results").scrollIntoView({ behavior: "smooth" });
-});
