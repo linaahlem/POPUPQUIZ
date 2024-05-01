@@ -172,38 +172,60 @@
       </div>
     </section>
 
+<section id="timer" class="text-center">
+  <div class="section-title" style="margin-top: 65px;">
+    <h2>Qr code</h2>
+  </div>
 
-    <section id="timer" class="text-center">
-      <div class="section-title" style="margin-top: 65px;">
-        <h2>Qr code</h2>
+  <div id="timer-container" style="margin-top: 80px; width: 50%;">
+    <h4>Set Time:</h4>
+    <div class="input-group mb-3" style="margin: 100px auto;align-items: center;justify-content: space-between;text-align: center;">
+      <!-- Hours input -->
+      <div style="text-align:center;">
+        <span>Hours</span>
+        <br>
+        <input type="number" id="hours" class="form-control" min="0" value="0">
       </div>
 
-      <div id="timer-container" style="margin-top: 80px;" style="width: 50%; margin: auto;">
-        <h3>Set Minutes:</h3>
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <button class="btn btn-outline-secondary" type="button" onclick="decrementMinutes()">-</button>
-          </div>
-          <input type="number" id="minutes" class="form-control" min="1" value="1">
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" onclick="incrementMinutes()">+</button>
-          </div>
-        </div>
-        <button type="button" class="btn btn-success"
-          style="margin-top:50px; margin-bottom: 150px; background-color: #274C77 !important;"
-          onclick="startTimer()">Start Quiz</button>
+      <!-- Minutes input -->
+      <div style="text-align:center;">
+        <span>Minutes</span>
+        <br>
+        <input type="number" id="minutes" class="form-control" min="0" value="0">
       </div>
-      <div id="countdown" class="mt-3"></div>
-      <!-- Display static QR code image -->
-      <div id="qr-code-container" class="mt-3" style="display: none;">
-        <img src="./assets/img/qr-code/qr.png" alt="QR code" class="img-fluid">
+
+      <!-- Seconds input -->
+      <div style="text-align:center;">
+        <span>Seconds</span>
+        <br>
+        <input type="number" id="seconds" class="form-control" min="0" value="0">
       </div>
-      <button id="see-results" class="btn btn-primary mt-3"
-        style="display: none;background-color: #274C77;margin-bottom: 100px;border-color: #274C77;">See Results</button>
-    </section>
+    </div>
 
-  </main><!-- End #main -->
+    <div id="countdown" class="mt-3">hh</div>
 
+    <button type="button" class="btn btn-success" id="startBtn"
+            style="margin-top:50px; margin-bottom: 20px; background-color: #274C77 !important;"
+            onclick="startTimer()">Start Quiz</button>
+  </div>
+
+  <!-- Display QR code after starting the timer -->
+  <div id="qr-code-container" class="mt-3" style="display: none;">
+    <img id="qrCodeImg" src="" alt="QR code" class="img-fluid">
+  </div>
+
+  <!-- Display static QR code image -->
+  <div id="qr-code-container-static" class="mt-3" style="display: none;">
+    <img id="qrCodeImg" alt="QR code" class="img-fluid">
+  </div>
+  <button id="see-results" class="btn btn-primary mt-3"
+          style="display: none;margin-bottom:100px; margin-bottom: 50px;background-color: #274C77;border-color: #274C77;">See Results</button>
+</section>
+
+
+    
+    
+    
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
@@ -217,15 +239,8 @@
         <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
       <div class="copyright">
-        &copy; Copyright <strong><span>MyResume</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: [license-url] -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/free-html-bootstrap-template-my-resume/ -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
+        &copy; Copyright <strong><span>US</span></strong>. All Rights Reserved
+ </div>
     </div>
   </footer><!-- End Footer -->
 
