@@ -59,11 +59,11 @@
 
     <nav id="navbar" class="navbar nav-menu">
       <ul>
-        <li onclick="HeroDisplay()"><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home"></i> <span>Home</span></a></li>
-        <li  onclick="PdfDisplay()"><a href="#about" class="nav-link scrollto"><i class="bx bx-file-blank"></i> <span>Upload</span></a></li>
-        <li onclick="quizDisplay()"><a href="#quiz_section" class="nav-link scrollto"><i class="bx bx-server"></i> <span>Quiz</span></a></li>
-        <li onclick="timeDisplay()"><a href="#timer" class="nav-link scrollto"><i class="bx bx-book-content"></i> <span>Qr</span></a></li>
-        <li onclick="statsDisplay()"><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i> <span>Contact</span></a></li>
+        <li onclick="HeroDisplay()"><a  id='hero-select'  href="#hero" class="nav-link scrollto active"><i class="bx bx-home"></i> <span>Home</span></a></li>
+        <li onclick="PdfDisplay()"><a id='pdf-select' href="#about" class="nav-link scrollto"><i class="bx bx-file-blank"></i> <span>Upload</span></a></li>
+        <li onclick="quizDisplay()"><a id='quiz-select' href="#quiz_section" class="nav-link scrollto"><i class="bx bx-server"></i> <span>Quiz</span></a></li>
+        <li onclick="timeDisplay()"><a id='time-select' href="#timer" class="nav-link scrollto"><i class="bx bx-book-content"></i> <span>Qr</span></a></li>
+        <li onclick="statsDisplay()"><a id='stats-select' href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i> <span>Contact</span></a></li>
       </ul>
     </nav><!-- .nav-menu -->
 
@@ -116,7 +116,7 @@
   
                   <div class="row justify-content-center questions-details">
                     <div style="width: 30%;" class="input-field">
-                      <p>Number of Questions</p><input type="text" value="10" required>
+                      <p>Number of Questions</p><input id="numberInput" oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="number" min ="1" max ="30" value="10" required>
                     </div>
                     <div style="width: 30%;" class="input-field">
                       <p>Type of Questions</p>
@@ -128,7 +128,7 @@
                       </select>
                     </div>
                     <div style="width: 30%;" class="input-field">
-                      <p>Number of Options</p><input type="number" value="3" min="2" max="5" required>
+                      <p>Number of Options</p><input id="numberInput" oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="number" value="3" min="2" max="5" required>
                     </div>
   
                   </div>

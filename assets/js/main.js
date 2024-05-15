@@ -854,3 +854,8 @@ function statsDisplay(){
   statsSelect.style.backgroundColor = "#274C77";
   statsSelect.style.color = "#f2f3f5";
 }
+
+
+
+
+
