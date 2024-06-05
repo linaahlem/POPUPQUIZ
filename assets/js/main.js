@@ -344,29 +344,30 @@ Quiz Part
 */
 
 // Sample data structure containing quiz questions
-// var quizData = [
-//   {
-//     question: "What is the capital of France?",
-//     options: [
-//       { text: "Paris", isCorrect: true },
-//       { text: "Madrid", isCorrect: false },
-//       { text: "Berlin", isCorrect: false }
-//     ]
-//   },
-//   {
-//     question: "What is the capital of Spain?",
-//     options: [
-//       { text: "Paris", isCorrect: false },
-//       { text: "Madrid", isCorrect: true },
-//       { text: "Berlin", isCorrect: false }
-//     ]
-//   },
-// ];
+var quizData = [
+  {
+    question: "What is the capital of France?",
+    options: [
+      { text: "Paris", isCorrect: true },
+      { text: "Madrid", isCorrect: false },
+      { text: "Berlin", isCorrect: false }
+    ]
+  },
+  {
+    question: "What is the capital of Spain?",
+    options: [
+      { text: "Paris", isCorrect: false },
+      { text: "Madrid", isCorrect: true },
+      { text: "Berlin", isCorrect: false }
+    ]
+  },
+];
 
 
 //to use it for url qr code
 
 var code_url ="";
+var formId;
 
 //function to convert this array to json and create the form and generate qr code
 
@@ -417,6 +418,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const responseData = await response.json();
         console.log('Form created:', responseData);
         const formUrl = responseData.formUrl;
+        formId = responseData.formId;
+        console.log('Assigned formId:', formId);
+
         // Generate QR code based on the form URL
          code_url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(formUrl)}`;
          img.src = code_url;
@@ -737,50 +741,129 @@ var resetBtn = document.getElementById("resetBtn");
 var buttonsContainer = document.getElementById("buttons-container");
 
 
+// function startTimer(initialRemainingSeconds) {
+//   var hours = parseInt(document.getElementById("hours").value);
+//   var minutes = parseInt(document.getElementById("minutes").value);
+//   var seconds = parseInt(document.getElementById("seconds").value);
+  
+//   if (initialRemainingSeconds === undefined) { // If initialRemainingSeconds is not passed, calculate totalSeconds
+//     totalSeconds = hours * 3600 + minutes * 60 + seconds;
+//   } else { // If initialRemainingSeconds is passed, use it
+//     totalSeconds = initialRemainingSeconds;
+//   }
+
+//   // Store total seconds in remaining seconds initially
+//   remainingSeconds = totalSeconds;
+
+//   // Hide setting of time and start button
+//   inputGroup.style.display = "none";
+//   startBtn.style.display= "none";
+//   buttonsContainer.style.display= "flex";
+//   timerDisplay.style.display = "block";
+//   timerDisplay.style.fontSize = "25px"; // Display the QR code container
+//   timerDisplay.style.fontWeight = "bold"; // Display the QR code container
+
+//   // Start the countdown
+//   interval = setInterval(function () {
+//     var hoursLeft = Math.floor(remainingSeconds / 3600); // Use remainingSeconds here
+//     var minutesLeft = Math.floor((remainingSeconds % 3600) / 60); // Use remainingSeconds here
+//     var secondsLeft = remainingSeconds % 60; // Use remainingSeconds here
+
+//     // Update the timer display with the countdown numbers
+//     timerDisplay.textContent = `${hoursLeft.toString().padStart(2, '0')}:${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`;
+
+//     if (remainingSeconds <= 0) { // Use remainingSeconds here
+//       clearInterval(interval);
+//       timerDisplay.textContent = "Time's up!";
+//       buttonsContainer.style.display = "none";
+//       seeResultsButton.style.display = "block";
+//     } else {
+//       remainingSeconds--; // Decrease remainingSeconds instead of totalSeconds
+//       qrCodeContainer.style.display = "block"; // Display the QR code container
+//       generateQRCode('https://www.google.com'); // Generate QR code
+//     }
+//   }, 1000);
+// }
+
 function startTimer(initialRemainingSeconds) {
   var hours = parseInt(document.getElementById("hours").value);
   var minutes = parseInt(document.getElementById("minutes").value);
   var seconds = parseInt(document.getElementById("seconds").value);
   
-  if (initialRemainingSeconds === undefined) { // If initialRemainingSeconds is not passed, calculate totalSeconds
+  if (initialRemainingSeconds === undefined) {
     totalSeconds = hours * 3600 + minutes * 60 + seconds;
-  } else { // If initialRemainingSeconds is passed, use it
+  } else {
     totalSeconds = initialRemainingSeconds;
   }
 
-  // Store total seconds in remaining seconds initially
   remainingSeconds = totalSeconds;
 
-  // Hide setting of time and start button
   inputGroup.style.display = "none";
-  startBtn.style.display= "none";
-  buttonsContainer.style.display= "flex";
+  startBtn.style.display = "none";
+  buttonsContainer.style.display = "flex";
   timerDisplay.style.display = "block";
-  timerDisplay.style.fontSize = "25px"; // Display the QR code container
-  timerDisplay.style.fontWeight = "bold"; // Display the QR code container
+  timerDisplay.style.fontSize = "25px";
+  timerDisplay.style.fontWeight = "bold";
 
-  // Start the countdown
   interval = setInterval(function () {
-    var hoursLeft = Math.floor(remainingSeconds / 3600); // Use remainingSeconds here
-    var minutesLeft = Math.floor((remainingSeconds % 3600) / 60); // Use remainingSeconds here
-    var secondsLeft = remainingSeconds % 60; // Use remainingSeconds here
+    var hoursLeft = Math.floor(remainingSeconds / 3600);
+    var minutesLeft = Math.floor((remainingSeconds % 3600) / 60);
+    var secondsLeft = remainingSeconds % 60;
 
-    // Update the timer display with the countdown numbers
     timerDisplay.textContent = `${hoursLeft.toString().padStart(2, '0')}:${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`;
 
-    if (remainingSeconds <= 0) { // Use remainingSeconds here
+    if (remainingSeconds <= 0) {
       clearInterval(interval);
       timerDisplay.textContent = "Time's up!";
       buttonsContainer.style.display = "none";
       seeResultsButton.style.display = "block";
+      
+      // Trigger form closure
+      closeForm(formId);
     } else {
-      remainingSeconds--; // Decrease remainingSeconds instead of totalSeconds
-      qrCodeContainer.style.display = "block"; // Display the QR code container
-      generateQRCode('https://www.google.com'); // Generate QR code
+      remainingSeconds--;
+      qrCodeContainer.style.display = "block";
+      generateQRCode('https://www.google.com');
     }
   }, 1000);
 }
 
+
+function closeForm(formId) {
+  // Ensure formId is passed correctly
+  if (!formId) {
+    alert("Form ID is required to close the form.");
+    return;
+  }
+
+  fetch('http://localhost:3000/api/close-form', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ formId })
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('Form closed successfully');
+    } else {
+      console.error('Failed to close form');
+      response.text().then(text => {
+        console.error('Response:', text);
+        alert("Failed to close form: " + text + formId);
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error closing form:', error);
+    alert('Error closing the form.');
+  });
+
+  // var form = FormApp.getActiveForm();
+  // form.setAcceptingResponses(false);
+  // deleteTriggers_();
+
+}
 
 function restartTimer() {
   clearInterval(interval);
@@ -822,14 +905,10 @@ function changeValue(id, direction) {
 }
 
 
-function generateQRCode(qrCodeLink) {
-  var qrCodeImg = document.getElementById("qrCodeImg");
-  qrCodeImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrCodeLink);
-}
-
-
-
-
+// function generateQRCode(qrCodeLink) {
+//   var qrCodeImg = document.getElementById("qrCodeImg");
+//   qrCodeImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrCodeLink);
+// }
 
 var hero = document.getElementById("hero-section");
 var about = document.getElementById("about");
