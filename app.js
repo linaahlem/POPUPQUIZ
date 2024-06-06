@@ -16,8 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 const OAuth2Client = google.auth.OAuth2;
-const CLIENT_ID =
-  "712015173804-411e4pqa7jjldl3lrt6eb2t6raj3ror3.apps.googleusercontent.com";
+const CLIENT_ID = "712015173804-411e4pqa7jjldl3lrt6eb2t6raj3ror3.apps.googleusercontent.com";
 const CLIENT_SECRET = "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";
 const REDIRECT_URI = "http://localhost:3000/oauth2callback";
 
@@ -25,6 +24,7 @@ const oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 const SCOPES = [
   "https://www.googleapis.com/auth/forms",
   "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/spreadsheets.readonly"
 ];
 const TOKEN_PATH = path.join(__dirname, 'token.json');
 
@@ -78,6 +78,9 @@ app.get("/oauth2callback", async (req, res) => {
   }
 });
 
+
+let formId; // Declare formId outside the endpoint handler
+
 app.post("/api/create-form", async (req, res) => {
   if (!oauth2Client.credentials || !oauth2Client.credentials.access_token) {
     return res.status(401).send("Authentication is required.");
@@ -106,13 +109,60 @@ app.post("/api/create-form", async (req, res) => {
 
     const formUrl = `https://docs.google.com/forms/d/${createResponse.data.formId}/viewform`;
 
-    res.json({ formUrl, formData: createResponse.data });
+    // Assign the form ID obtained from the creation response to formId
+    formId = createResponse.data.formId;
+    console.log('Form ID:', formId);
+
+    res.json({ formUrl, formId, formData: createResponse.data });
 
   } catch (error) {
     console.error('Failed to create form:', error);
     res.status(500).send("Failed to create form.");
   }
 });
+
+
+app.post("/api/get-responses", async (req, res) => {
+  try {
+    if (!oauth2Client.credentials || !oauth2Client.credentials.access_token) {
+      return res.status(401).send("Authentication is required.");
+    }
+
+    if (!formId) {
+      return res.status(400).send("Form ID is required.");
+    }
+
+    await oauth2Client.getAccessToken();
+
+    const forms = google.forms({
+      version: "v1",
+      auth: oauth2Client,
+    });
+
+    const formResponse = await forms.forms.responses.list({
+      formId: formId,
+    });
+
+    console.log("Form Response:", formResponse);
+
+    const responses = formResponse.data.responses;
+
+    const responsePath = path.join(__dirname, 'responses.json');
+    
+    // Empty the file before writing new responses
+    fs.writeFileSync(responsePath, '');
+
+    // Write the new responses to the file
+    fs.writeFileSync(responsePath, JSON.stringify(responses, null, 2));
+
+    res.json({ responses });
+  } catch (error) {
+    console.error('Failed to get responses:', error);
+    res.status(500).send("Failed to get responses.");
+  }
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

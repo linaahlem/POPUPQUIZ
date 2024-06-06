@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
 Model part
 */
 
-var quizData
+
 
 
 async function callPythonFunction() {
@@ -344,24 +344,24 @@ Quiz Part
 */
 
 // Sample data structure containing quiz questions
-// var quizData = [
-//   {
-//     question: "What is the capital of France?",
-//     options: [
-//       { text: "Paris", isCorrect: true },
-//       { text: "Madrid", isCorrect: false },
-//       { text: "Berlin", isCorrect: false }
-//     ]
-//   },
-//   {
-//     question: "What is the capital of Spain?",
-//     options: [
-//       { text: "Paris", isCorrect: false },
-//       { text: "Madrid", isCorrect: true },
-//       { text: "Berlin", isCorrect: false }
-//     ]
-//   },
-// ];
+var quizData = [
+   {
+     question: "What is the capital of France?",
+    options: [
+      { text: "Paris", isCorrect: true },
+      { text: "Madrid", isCorrect: false },
+      { text: "Berlin", isCorrect: false }
+    ]
+   },
+   {
+    question: "What is the capital of Spain?",
+    options: [
+      { text: "Paris", isCorrect: false },
+      { text: "Madrid", isCorrect: true },
+      { text: "Berlin", isCorrect: false }
+    ]
+   },
+ ];
 
 
 //to use it for url qr code
@@ -369,6 +369,8 @@ Quiz Part
 var code_url ="";
 
 //function to convert this array to json and create the form and generate qr code
+
+let formID;
 
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("validate-quiz-button").addEventListener("click", async () => {
@@ -417,6 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const responseData = await response.json();
         console.log('Form created:', responseData);
         const formUrl = responseData.formUrl;
+        formID = responseData.formId;
         // Generate QR code based on the form URL
          code_url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(formUrl)}`;
          img.src = code_url;
@@ -429,6 +432,111 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("see-results").addEventListener("click", async () => {
+    try {
+      const formId = formID; // Replace 'formID' with the actual form ID or retrieve it dynamically if needed
+      console.log('Fetching responses for form ID:', formId);
+
+      const response = await fetch('http://localhost:3000/api/get-responses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ formId })
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Form responses:', responseData.responses);
+
+        // Calculate the number of students who replied to the form
+        const numberOfResponses = responseData.responses.length;
+        console.log('Number of students who replied:', numberOfResponses);
+
+        // Update the attendance section with the number of responses
+        const attendanceTable = document.getElementById('attendance-table');
+        attendanceTable.innerHTML = `<p>The number of responses for this quiz is: ${numberOfResponses}</p>`;
+
+        // Show the statistics section
+        document.getElementById('statistics').style.display = 'block';
+
+        // Scroll to the attendance section
+        document.getElementById('pills-attendance').scrollIntoView({ behavior: 'smooth' });
+
+        // Process responses and render pie charts
+        renderPieCharts(responseData.responses);
+      } else {
+        console.error('Failed to fetch responses');
+      }
+    } catch (error) {
+      console.error('Error fetching responses:', error);
+    }
+  });
+});
+
+
+
+
+function renderPieCharts(responses) {
+  // Aggregate answers by question ID
+  const questionAggregates = {};
+
+  responses.forEach(response => {
+    Object.entries(response.answers).forEach(([questionId, answerData]) => {
+      const answer = answerData.textAnswers.answers[0].value;
+
+      if (!questionAggregates[questionId]) {
+        questionAggregates[questionId] = {};
+      }
+      if (!questionAggregates[questionId][answer]) {
+        questionAggregates[questionId][answer] = 0;
+      }
+
+      questionAggregates[questionId][answer]++;
+    });
+  });
+
+  // Calculate percentages and render pie charts
+  const graphsContainer = document.getElementById('pills-graphs');
+  graphsContainer.innerHTML = ''; // Clear any existing content
+
+  Object.entries(questionAggregates).forEach(([questionId, answers]) => {
+    const labels = Object.keys(answers);
+    const data = Object.values(answers).map(count => (count / responses.length) * 100);
+
+    // Create a canvas element for the pie chart
+    const canvas = document.createElement('canvas');
+    graphsContainer.appendChild(canvas);
+
+    // Render the pie chart
+    new Chart(canvas, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'], // Customize colors as needed
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: `Question ${questionId}`
+          }
+        }
+      }
+    });
+  });
+}
+
+
 
 
 
@@ -954,3 +1062,6 @@ function statsDisplay(){
   // statsSelect.style.backgroundColor = "#274C77";
   // statsSelect.style.color = "#f2f3f5";
 }
+
+
+
